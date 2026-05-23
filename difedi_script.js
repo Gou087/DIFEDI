@@ -8,7 +8,7 @@ const SERVICES = {
     {id:"notas",label:"Comentarios adicionales",type:"ta",placeholder:"Cuéntenos más sobre su situación contable..."},
   ]},
   administrativa:{name:"Gestión Administrativa",icon:"🏢",sb:"sb-orange",fields:[
-    {id:"tipo_emp",label:"Tipo de empresa",type:"radio",options:["Natural", "Juridica"]},
+    {id:"tipo_emp",label:"Tipo de persona",type:"radio",options:["Natural","Jurídica","Otro"]},
     {id:"sector",label:"Sector económico",type:"text",placeholder:"Ej: Comercio, Servicios, Manufactura..."},
     {id:"nec_adm",label:"¿Qué necesita gestionar?",type:"cb",options:["Estructura organizacional","Manual de funciones","Procesos internos","Trámites legales","RRHH y nómina","Archivo y documentación"]},
     {id:"urgencia",label:"Urgencia del servicio",type:"radio",options:["Inmediata","Este mes","En 1–3 meses","Explorando opciones"]},
@@ -22,8 +22,8 @@ const SERVICES = {
     {id:"notas",label:"Situación o reto financiero",type:"ta",placeholder:"Explíquenos el contexto para personalizar nuestra propuesta..."},
   ]},
   parametrizacion:{name:"Parametrización y Automatización",icon:"⚙️",sb:"sb-teal",fields:[
-    {id:"software_p",label:"Software a parametrizar",type:"cb",options:["Siigo Nube","World Office","SAP","QuickBooks","Excel avanzado","Otro ERP"]},
     {id:"software_p",label:"Software a parametrizar",type:"cb",options:["Siigo Nube","World Office","Siigo Pyme","Excel avanzado","Otro Software"]},
+    {id:"procesos",label:"Procesos a automatizar",type:"cb",options:["Facturación electrónica","Nómina electrónica","Reportes automáticos","Conciliaciones","Inventarios","Cartera"]},
     {id:"nivel",label:"Nivel tecnológico actual",type:"radio",options:["Muy básico (papel/Excel)","Básico (software simple)","Intermedio","Avanzado"]},
     {id:"usuarios",label:"Usuarios del sistema",type:"select",options:["1–3","4–10","11–30","30+"]},
     {id:"notas",label:"Proceso a automatizar",type:"ta",placeholder:"¿Qué tareas consume más tiempo y quisiera optimizar?"},
@@ -37,13 +37,19 @@ const SERVICES = {
   ]}
 };
 
-let selectedSvc = null, waKey = '', detailValues = {}, detailChecks = {}, detailRadios = {};
+let selectedSvc = [], detailValues = {}, detailChecks = {}, detailRadios = {};
 
 function selectSvc(el){
-  document.querySelectorAll('.svc').forEach(s=>s.classList.remove('sel'));
-  el.classList.add('sel');
-  selectedSvc = el.dataset.id;
-  document.getElementById('btn1').disabled = false;
+  const id = el.dataset.id;
+  const idx = selectedSvc.indexOf(id);
+  if(idx > -1){
+    selectedSvc.splice(idx, 1);
+    el.classList.remove('sel');
+  } else {
+    selectedSvc.push(id);
+    el.classList.add('sel');
+  }
+  document.getElementById('btn1').disabled = selectedSvc.length === 0;
 }
 
 function updateSteps(cur){
@@ -65,45 +71,63 @@ function goTo(step){
 }
 
 function renderBanner(n){
-  const s=SERVICES[selectedSvc];
-  if(!s)return;
+  if(!selectedSvc.length)return;
   const b=document.getElementById('svc-banner'+n);
-  b.className='sbn '+s.sb;
-  b.innerHTML=`<span style="font-size:18px">${s.icon}</span> Servicio: <strong>${s.name}</strong>`;
+  if(selectedSvc.length===1){
+    const s=SERVICES[selectedSvc[0]];
+    b.className='sbn '+s.sb;
+    b.innerHTML=`<span style="font-size:18px">${s.icon}</span> Servicio: <strong>${s.name}</strong>`;
+  } else {
+    const names=selectedSvc.map(id=>SERVICES[id]?.name).join(', ');
+    b.className='sbn sb-blue';
+    b.innerHTML=`📦 Servicios: <strong>${names}</strong>`;
+  }
 }
 
 function renderDetailFields(){
-  const s=SERVICES[selectedSvc]; if(!s)return;
   const c=document.getElementById('detail-fields'); c.innerHTML='';
-  s.fields.forEach(f=>{
-    if(f.type==='text'){
-      const d=document.createElement('div');
-      d.innerHTML=`<label class="flbl">${f.label}</label><input class="fi" id="df-${f.id}" placeholder="${f.placeholder||''}" value="${detailValues[f.id]||''}"/>`;
-      d.querySelector('input').oninput=e=>{detailValues[f.id]=e.target.value};
-      c.appendChild(d);
-    } else if(f.type==='select'){
-      const d=document.createElement('div');
-      let opts=`<option value="">— Seleccione —</option>`+f.options.map(o=>`<option${detailValues[f.id]===o?' selected':''}>${o}</option>`).join('');
-      d.innerHTML=`<label class="flbl">${f.label}</label><select class="fs" id="df-${f.id}">${opts}</select>`;
-      d.querySelector('select').onchange=e=>{detailValues[f.id]=e.target.value};
-      c.appendChild(d);
-    } else if(f.type==='ta'){
-      const d=document.createElement('div'); d.className='fg2';
-      d.innerHTML=`<label class="flbl">${f.label}</label><textarea class="fta" id="df-${f.id}" placeholder="${f.placeholder||''}">${detailValues[f.id]||''}</textarea>`;
-      d.querySelector('textarea').oninput=e=>{detailValues[f.id]=e.target.value};
-      c.appendChild(d);
-    } else if(f.type==='radio'){
-      const d=document.createElement('div'); d.className='fg2';
-      const btns=f.options.map(o=>`<div class="ri${detailRadios[f.id]===o?' sel':''}" onclick="pickRadio('${f.id}','${o}',this)"><div class="rd"></div>${o}</div>`).join('');
-      d.innerHTML=`<label class="flbl">${f.label}</label><div class="rgrp">${btns}</div>`;
-      c.appendChild(d);
-    } else if(f.type==='cb'){
-      const d=document.createElement('div'); d.className='fg2';
-      const items=(detailChecks[f.id]||[]);
-      const boxes=f.options.map(o=>`<div class="cbi${items.includes(o)?' on':''}" onclick="toggleCb('${f.id}','${o}',this)"><div class="cbx">${items.includes(o)?'✓':''}</div><span class="cbt">${o}</span></div>`).join('');
-      d.innerHTML=`<label class="flbl">${f.label}</label><div class="cbgrid">${boxes}</div>`;
-      c.appendChild(d);
+  if(!selectedSvc.length)return;
+  selectedSvc.forEach(svcId=>{
+    const s=SERVICES[svcId]; if(!s)return;
+    const sec=document.createElement('div');
+    sec.style.marginBottom='24px';
+    if(selectedSvc.length>1){
+      const hdr=document.createElement('div');
+      hdr.style.cssText='font-size:14px;font-weight:600;color:#666;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #F0F3FB';
+      hdr.textContent=`${s.icon} ${s.name}`;
+      sec.appendChild(hdr);
     }
+    s.fields.forEach(f=>{
+      if(f.type==='text'){
+        const d=document.createElement('div');
+        d.innerHTML=`<label class="flbl">${f.label}</label><input class="fi" id="df-${f.id}" placeholder="${f.placeholder||''}" value="${detailValues[f.id]||''}"/>`;
+        d.querySelector('input').oninput=e=>{detailValues[f.id]=e.target.value};
+        sec.appendChild(d);
+      } else if(f.type==='select'){
+        const d=document.createElement('div');
+        let opts=`<option value="">— Seleccione —</option>`+f.options.map(o=>`<option${detailValues[f.id]===o?' selected':''}>${o}</option>`).join('');
+        d.innerHTML=`<label class="flbl">${f.label}</label><select class="fs" id="df-${f.id}">${opts}</select>`;
+        d.querySelector('select').onchange=e=>{detailValues[f.id]=e.target.value};
+        sec.appendChild(d);
+      } else if(f.type==='ta'){
+        const d=document.createElement('div'); d.className='fg2';
+        d.innerHTML=`<label class="flbl">${f.label}</label><textarea class="fta" id="df-${f.id}" placeholder="${f.placeholder||''}">${detailValues[f.id]||''}</textarea>`;
+        d.querySelector('textarea').oninput=e=>{detailValues[f.id]=e.target.value};
+        sec.appendChild(d);
+      } else if(f.type==='radio'){
+        const d=document.createElement('div'); d.className='fg2';
+        const btns=f.options.map(o=>`<div class="ri${detailRadios[f.id]===o?' sel':''}" onclick="pickRadio('${f.id}','${o}',this)"><div class="rd"></div>${o}</div>`).join('');
+        d.innerHTML=`<label class="flbl">${f.label}</label><div class="rgrp">${btns}</div>`;
+        sec.appendChild(d);
+      } else if(f.type==='cb'){
+        const d=document.createElement('div'); d.className='fg2';
+        const items=(detailChecks[f.id]||[]);
+        const boxes=f.options.map(o=>`<div class="cbi${items.includes(o)?' on':''}" onclick="toggleCb('${f.id}','${o}',this)"><div class="cbx">${items.includes(o)?'✓':''}</div><span class="cbt">${o}</span></div>`).join('');
+        d.innerHTML=`<label class="flbl">${f.label}</label><div class="cbgrid">${boxes}</div>`;
+        sec.appendChild(d);
+      }
+    });
+    c.appendChild(sec);
   });
 }
 
@@ -125,9 +149,14 @@ function checkStep2(){
 }
 
 function buildMessage(){
-  const s=SERVICES[selectedSvc]||{};
   let m=`🔔 NUEVA COTIZACIÓN DIFEDI\n\n`;
-  m+=`📋 Servicio: ${s.name||selectedSvc}\n`;
+  if(selectedSvc.length===1){
+    const s=SERVICES[selectedSvc[0]]||{};
+    m+=`📋 Servicio: ${s.name||selectedSvc[0]}\n`;
+  } else {
+    const names=selectedSvc.map(id=>SERVICES[id]?.name||id).join(', ');
+    m+=`📦 Servicios: ${names}\n`;
+  }
   m+=`👤 Nombre: ${document.getElementById('f-nombre').value}\n`;
   const emp=document.getElementById('f-empresa').value; if(emp) m+=`🏢 Empresa: ${emp}\n`;
   const car=document.getElementById('f-cargo').value; if(car) m+=`💼 Cargo: ${car}\n`;
@@ -143,16 +172,10 @@ function buildMessage(){
   return m;
 }
 
-function sendWhatsApp(){
-  if(!waKey)return false;
-  const msg=encodeURIComponent(buildMessage());
-  new Image().src=`https://api.callmebot.com/whatsapp.php?phone=573057509432&text=${msg}&apikey=${waKey}`;
-  return true;
-}
 
 function sendEmail(){
-  const s=SERVICES[selectedSvc]||{};
-  const subject=encodeURIComponent(`🔔 Nueva Cotización DIFEDI – ${s.name} – ${document.getElementById('f-nombre').value}`);
+  const svcNames=selectedSvc.length===1 ? SERVICES[selectedSvc[0]]?.name : `${selectedSvc.length} servicios`;
+  const subject=encodeURIComponent(`🔔 Nueva Cotización DIFEDI – ${svcNames} – ${document.getElementById('f-nombre').value}`);
   const body=encodeURIComponent(buildMessage());
   window.open(`mailto:difediemp@gmail.com?subject=${subject}&body=${body}`);
   return true;
@@ -160,27 +183,18 @@ function sendEmail(){
 
 function submitForm(){
   goTo(4);
-  const waOk=sendWhatsApp();
   setTimeout(()=>sendEmail(),300);
   setTimeout(()=>{
     const ne=document.getElementById('notif-email');
     ne.className='nc ok'; ne.innerHTML='✅ Correo preparado para enviar';
-    const nw=document.getElementById('notif-wa');
-    if(waOk){nw.className='nc ok';nw.innerHTML='✅ WhatsApp enviado'}
-    else{nw.className='nc err';nw.innerHTML='⚠️ WhatsApp sin configurar'}
-    if(!waOk){
-      const ib=document.createElement('div');ib.className='info-box';
-      ib.innerHTML='💡 <strong>Activa WhatsApp:</strong> Toca "Configurar avisos" arriba para recibir notificaciones en tu celular.';
-      document.querySelector('.success').insertBefore(ib,document.getElementById('summary-box'));
-    }
   },1800);
   renderSummary();
 }
 
 function renderSummary(){
-  const s=SERVICES[selectedSvc]||{};
+  const svcText=selectedSvc.length===1 ? SERVICES[selectedSvc[0]]?.name : selectedSvc.map(id=>SERVICES[id]?.name).join(', ');
   let rows=[
-    ['Servicio',s.name||selectedSvc],
+    ['Servicio(s)',svcText],
     ['Nombre',document.getElementById('f-nombre').value+(document.getElementById('f-empresa').value?' — '+document.getElementById('f-empresa').value:'')],
     ['Correo',document.getElementById('f-email').value],
     ['Teléfono',document.getElementById('f-tel').value],
@@ -193,7 +207,7 @@ function renderSummary(){
 }
 
 function resetForm(){
-  selectedSvc=null;detailValues={};detailChecks={};detailRadios={};
+  selectedSvc=[];detailValues={};detailChecks={};detailRadios={};
   ['f-nombre','f-empresa','f-cargo','f-ciudad','f-email','f-tel'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('btn1').disabled=true;
   document.getElementById('btn2').disabled=true;
@@ -201,16 +215,3 @@ function resetForm(){
   document.getElementById('summary-box').innerHTML='';
   document.querySelector('.success .info-box') && document.querySelector('.success .info-box').remove();
   goTo(1);
-}
-
-function saveWaKey(){
-  const v=document.getElementById('wa-key-input').value.trim();
-  if(!v)return;
-  waKey=v;
-  document.getElementById('wa-saved-msg').style.display='block';
-  document.getElementById('wa-pill').style.background='#DCFCE7';
-  document.getElementById('wa-pill').style.color='#166534';
-  document.getElementById('wa-pill').textContent='✓ Activado';
-  document.getElementById('wa-dot').className='dot on';
-  document.getElementById('cfg-label').textContent='Notificaciones ON';
-}
