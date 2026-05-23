@@ -8,7 +8,7 @@ const SERVICES = {
     {id:"notas",label:"Comentarios adicionales",type:"ta",placeholder:"Cuéntenos más sobre su situación contable..."},
   ]},
   administrativa:{name:"Gestión Administrativa",icon:"🏢",sb:"sb-orange",fields:[
-    {id:"tipo_emp",label:"Tipo de empresa",type:"radio",options:["SAS","Ltda","Persona natural","Corporación / Fundación","Otro"]},
+    {id:"tipo_emp",label:"Tipo de persona",type:"radio",options:["Natural","Jurídica","Otro"]},
     {id:"sector",label:"Sector económico",type:"text",placeholder:"Ej: Comercio, Servicios, Manufactura..."},
     {id:"nec_adm",label:"¿Qué necesita gestionar?",type:"cb",options:["Estructura organizacional","Manual de funciones","Procesos internos","Trámites legales","RRHH y nómina","Archivo y documentación"]},
     {id:"urgencia",label:"Urgencia del servicio",type:"radio",options:["Inmediata","Este mes","En 1–3 meses","Explorando opciones"]},
@@ -22,7 +22,7 @@ const SERVICES = {
     {id:"notas",label:"Situación o reto financiero",type:"ta",placeholder:"Explíquenos el contexto para personalizar nuestra propuesta..."},
   ]},
   parametrizacion:{name:"Parametrización y Automatización",icon:"⚙️",sb:"sb-teal",fields:[
-    {id:"software_p",label:"Software a parametrizar",type:"cb",options:["Siigo Nube","World Office","SAP","QuickBooks","Excel avanzado","Otro ERP"]},
+    {id:"software_p",label:"Software a parametrizar",type:"cb",options:["Siigo Nube","World Office","Siigo Pyme","Excel avanzado","Otro Software"]},
     {id:"procesos",label:"Procesos a automatizar",type:"cb",options:["Facturación electrónica","Nómina electrónica","Reportes automáticos","Conciliaciones","Inventarios","Cartera"]},
     {id:"nivel",label:"Nivel tecnológico actual",type:"radio",options:["Muy básico (papel/Excel)","Básico (software simple)","Intermedio","Avanzado"]},
     {id:"usuarios",label:"Usuarios del sistema",type:"select",options:["1–3","4–10","11–30","30+"]},
@@ -87,7 +87,6 @@ function renderBanner(n){
 function renderDetailFields(){
   const c=document.getElementById('detail-fields'); c.innerHTML='';
   if(!selectedSvc.length)return;
-
   selectedSvc.forEach(svcId=>{
     const s=SERVICES[svcId]; if(!s)return;
     const sec=document.createElement('div');
@@ -98,7 +97,6 @@ function renderDetailFields(){
       hdr.textContent=`${s.icon} ${s.name}`;
       sec.appendChild(hdr);
     }
-
     s.fields.forEach(f=>{
       if(f.type==='text'){
         const d=document.createElement('div');
@@ -218,4 +216,5 @@ function resetForm(){
   document.querySelector('.success .info-box') && document.querySelector('.success .info-box').remove();
   goTo(1);
 }
+
 
