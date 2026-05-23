@@ -5,51 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>DIFEDI – Formulario de Cotización</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="difedi_styles.css"/>
+<link rel="stylesheet" href="Style.css"/>
 </head>
 <body>
 
-<!-- CONFIG MODAL -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="mh">
-      <div><div class="mt">⚙️ Configurar Notificaciones</div><div class="msub">Activa los avisos automáticos para DIFEDI</div></div>
-      <button class="mcl" onclick="document.getElementById('overlay').classList.remove('show')">✕</button>
-    </div>
-    <div class="mb">
-      <div class="ss-sec">
-        <div class="ss-title">📱 WhatsApp → +57 305 750 9432 <span class="pill" id="wa-pill" style="background:#FEE2E2;color:#991B1B">Sin configurar</span></div>
-        <div class="ss-steps">
-          <div class="ss-step"><div class="sn">1</div><div class="st">Desde tu WhatsApp <strong>(+57 305 750 9432)</strong>, agrega <strong>+34 644 59 30 69</strong> como contacto y envíale: <br/><br/><strong style="background:#F0F3FB;padding:3px 8px;border-radius:5px;display:inline-block;margin-top:3px">I allow callmebot to send me messages</strong></div></div>
-          <div class="ss-step"><div class="sn">2</div><div class="st">CallMeBot te responderá con tu <strong>API Key</strong> (número de 7 dígitos). Pégalo abajo.</div></div>
-          <div class="ss-step"><div class="sn">3</div><div class="st">¡Listo! Recibirás un WhatsApp por cada cotización. Es <strong>100% gratis</strong>.</div></div>
-        </div>
-        <div class="ki">
-          <input type="text" id="wa-key-input" placeholder="Pega aquí tu API Key de CallMeBot..."/>
-          <button onclick="saveWaKey()">Guardar</button>
-        </div>
-        <div id="wa-saved-msg" style="display:none;margin-top:7px;font-size:12px;color:#166534;font-weight:600">✅ API Key guardada — recibirás WhatsApp por cada cotización</div>
-      </div>
-      <div style="border-top:2px solid #F0F3FB;padding-top:18px">
-        <div class="ss-title">📧 Correo → difediemp@gmail.com <span class="pill ok">✓ Automático</span></div>
-        <div class="ibox">El correo se abre automáticamente con todos los datos de la cotización al enviar. Sin configuración extra. ✅</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- HEADER -->
 <div class="header">
   <div class="logo">
     <div class="logo-d">D</div>
     <div><div class="logo-name">DIFEDI</div><div class="logo-sub">Soluciones Empresariales</div></div>
-  </div>
-  <div class="header-right">
-    <button class="cfg-btn" onclick="document.getElementById('overlay').classList.add('show')">
-      <div class="dot" id="wa-dot"></div>
-      <span id="cfg-label">Configurar avisos</span>
-    </button>
-    <div class="badge">Cotización</div>
   </div>
 </div>
 
@@ -76,7 +41,7 @@
 <!-- STEP 1 -->
 <div id="step1">
   <div class="card-title">¿Qué servicio necesitas?</div>
-  <div class="card-sub">Selecciona el área en la que DIFEDI puede ayudarte</div>
+  <div class="card-sub">Selecciona el área en la que DIFEDI puede ayudarte — <strong>puedes elegir una o varias opciones</strong></div>
   <div class="svc-grid" id="svc-grid">
     <div class="svc" data-c="blue" data-id="contable" onclick="selectSvc(this)">
       <span class="svc-ico">📊</span><div class="svc-name">Servicios Contables</div>
@@ -141,7 +106,6 @@
     <div class="ok-sub">Un asesor de <strong>DIFEDI</strong> te contactará en menos de <strong>24 horas hábiles</strong>.</div>
     <div class="notif-row">
       <div class="nc send" id="notif-email"><span class="spin">⏳</span> Correo → difediemp@gmail.com</div>
-      <div class="nc send" id="notif-wa"><span class="spin">⏳</span> WhatsApp</div>
     </div>
     <div id="summary-box" class="summary"></div>
     <div class="br" style="justify-content:center;border-top:none;padding-top:0">
@@ -154,6 +118,6 @@
 
 <div class="footer">© 2025 DIFEDI — Soluciones Empresariales · Todos los derechos reservados</div>
 
-<script src="difedi_script.js"></script>
+<script src="Scrip.js"></script>
 </body>
 </html>
