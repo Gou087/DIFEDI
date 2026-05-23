@@ -8,7 +8,7 @@ const SERVICES = {
     {id:"notas",label:"Comentarios adicionales",type:"ta",placeholder:"Cuéntenos más sobre su situación contable..."},
   ]},
   administrativa:{name:"Gestión Administrativa",icon:"🏢",sb:"sb-orange",fields:[
-    {id:"tipo_emp",label:"Tipo de persona",type:"radio",options:["Natural","Juridica","Otro"]},
+    {id:"tipo_emp",label:"Tipo de persona",type:"radio",options:["Natural","Juridica",]},
     {id:"sector",label:"Sector económico",type:"text",placeholder:"Ej: Comercio, Servicios, Manufactura..."},
     {id:"nec_adm",label:"¿Qué necesita gestionar?",type:"cb",options:["Estructura organizacional","Manual de funciones","Procesos internos","Trámites legales","RRHH y nómina","Archivo y documentación"]},
     {id:"urgencia",label:"Urgencia del servicio",type:"radio",options:["Inmediata","Este mes","En 1–3 meses","Explorando opciones"]},
